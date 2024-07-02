@@ -1,0 +1,174 @@
+close all;
+clear all;
+load('yashproject','cimage2');
+mu1=10.13;
+mu2=12.94;
+%bin = native2unicode(mu2);
+figure(1),imshow(cimage2);
+%display(bin);
+gamma1=0.17;
+gamma2=0.14;
+X(1)=0.17; 
+Y(1)=0.40;
+p=256
+q=256
+
+for i=2:((p*q)/2)
+     
+     X(i) = (mu1*cos((X(i-1)*(1-X(i-1)))))+(gamma1*sin((Y(i-1)*Y(i-1))));
+         Y(i)=(mu2*cos((Y(i-1)*(1-Y(i-1)))))+(gamma2*sin(((X(i-1)*X(i-1)))+(X(i-1)*Y(i-1))));
+ end
+  %figure,plot(X,Y);
+ 
+ key1=zeros(p,q,'uint8');
+ key2=zeros(p,q,'uint8');
+ key3=zeros(p,q,'uint8');
+ 
+r = cimage2(:,:,1);
+g = cimage2(:,:,2);
+b = cimage2(:,:,3);
+% r(100:120,100:120)=0;
+% g(100:120,100:120)=0;
+% b(100:120,100:120)=0;
+ [m,n]=size(r);
+ %figure(2),imshow(r);
+ %figure(3),imshow(g);
+ %figure(4),imshow(b);
+% figure,imhist(r);
+ for i=1:m
+        sx(i)=X(i);
+        sy(i)=Y(i);
+ end
+    
+    [sortx1,indexx1]=sort(sx);
+         [sorty1,indexy1]=sort(sy);
+         
+         j=1;
+         for i=m:m+p-1
+        sx(j)=X(i);
+        sy(j)=Y(i);
+        j=j+1;
+ end
+    
+    [sortx1,indexx2]=sort(sx);
+         [sorty1,indexy2]=sort(sy);
+         
+     kj=m+p; 
+     j=1;
+         
+            for i=kj:kj+p-1
+        sx(j)=X(i);
+        sy(j)=Y(i);
+        j=j+1;
+ end
+    
+    [sortx1,indexx3]=sort(sx);
+         [sorty1,indexy3]=sort(sy);
+         %  this code for decrypt the r value
+
+         l=1;m=1;
+     for i=1:p
+         for j=1:q
+             if(mod(j,2)==0)
+             key1(i,j)=fix(mod((X(l)*1000),p));l=l+1;
+             else
+                 key1(i,j)=fix(mod((Y(l)*1000),q)); m=m+1;
+             end
+         end
+     end
+     key2= circshift(key1, [17,14]);
+     key3=circshift(key2, [10,12]);
+     er=bitxor(r,key1,'uint8');
+     eg=bitxor(g,key2,'uint8');
+     eb=bitxor(b,key3,'uint8');
+         % this is for r decryption
+       
+    ii=p+1;
+    for row=p:-1:1
+       ii=ii-1;
+       jj=p;
+         for col=q:-1:1
+           temp=er(row,col);
+           er(row,col)=er(indexx1(ii),indexy1(jj));
+          er(indexx1(ii),indexy1(jj))=temp;
+           jj=jj-1;
+         end
+    end
+         
+    %figure(5),imshow(er);
+    
+    
+    % this is for g decryption
+    
+      ii=p+1;
+    for row=p:-1:1
+       ii=ii-1;
+       jj=p;
+         for col=q:-1:1
+           temp=eg(row,col);
+           eg(row,col)=eg(indexx2(ii),indexy2(jj));
+          eg(indexx2(ii),indexy2(jj))=temp;
+           jj=jj-1;
+         end
+    end
+         
+    %figure(6),imshow(eg);
+    
+    
+%      this is for b decryption
+    
+      ii=p+1;
+    for row=p:-1:1
+       ii=ii-1;
+       jj=p;
+         for col=q:-1:1
+           temp=eb(row,col);
+           eb(row,col)=eb(indexx3(ii),indexy3(jj));
+          eb(indexx3(ii),indexy3(jj))=temp;
+           jj=jj-1;
+         end
+    end 
+    %figure(7),imshow(eb);
+    cimage3=cat(3,er,eg,eb);
+%figure(8),imshow(cimage3);
+subplot(3, 3, 1);
+imshow(cimage2);
+title('Original Encrypted Image');
+
+% Extracted Red Channel
+subplot(3, 3, 2);
+imshow(r);
+title('Extracted R');
+
+% Extracted Green Channel
+subplot(3, 3, 3);
+imshow(g);
+title('Extracted G');
+
+% Extracted Blue Channel
+subplot(3, 3, 4);
+imshow(b);
+title('Extracted B');
+
+% Decrypted Red Channel
+subplot(3, 3, 5);
+imshow(er);
+title('Decrypted R');
+
+% Decrypted Green Channel
+subplot(3, 3, 6);
+imshow(eg);
+title('Decrypted G');
+
+% Decrypted Blue Channel
+subplot(3, 3, 7);
+imshow(eb);
+title('Decrypted B');
+
+% Combined Decrypted RGB Image
+subplot(3, 3, [8, 9]);
+imshow(cimage3);
+title('Combined Decrypted RGB Image');
+
+% Adjust the layout to prevent overlapping
+sgtitle('Decryption Outputs');
