@@ -7,7 +7,8 @@ This MATLAB project demonstrates image encryption using chaotic maps, specifical
 
 ### Prerequisites
 
-- MATLAB installed on your computer.
+- MATLAB installed on your computer
+- You can work in MATLAB online tool(if not installed)
 
 ### Installation
 
