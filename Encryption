@@ -1,0 +1,287 @@
+%% 
+%% 
+clc;
+clear all;
+close all; 
+mu1=10.13;
+mu2=12.94;
+%bin = native2unicode(mu2);
+%display(bin);
+gamma1=0.17;
+gamma2=0.14;
+X(1)=0.17; 
+Y(1)=0.40;
+w=256
+h=256
+
+% for i=2:500
+%     
+%     X(i) = (mu1*(X(i-1)(1-X(i-1))))+(gamma1(Y(i-1)*Y(i-1)));
+%         Y(i)=(mu2*(Y(i-1)(1-Y(i-1))))+(gamma2((X(i-1)*X(i-1)))+(X(i-1)*Y(i-1)));
+% end
+% figure,plot(X,Y);
+ for i=2:(w*h*2)
+     
+     X(i) = (mu1*cos((X(i-1)*(1-X(i-1)))))+(gamma1*sin((Y(i-1)*Y(i-1))));
+     Y(i)=(mu2*cos((Y(i-1)*(1-Y(i-1)))))+(gamma2*sin(((X(i-1)*X(i-1)))+(X(i-1)*Y(i-1))));
+ end
+  %figure,plot(X,Y);
+url = 'https://images.macrumors.com/t/7pc3PgVMOcuW0ncg4PuJMIyWg9g=/400x0/article-new/2014/01/iris.jpg?lossy';
+
+% Specify the local file path where you want to save the image
+localFilePath = 'path_to_save_image.jpg';
+
+% Download the image from the URL to your local machine
+websave(localFilePath, url);
+
+% Read the downloaded image using imread
+im = imread(localFilePath);
+
+% Display the image
+%im=imread('Sunrise.bmp');
+  %figure(1),imshow(im);
+   
+ im1=imresize(im,[w h]);
+  nmatrix=im1;
+ key1=zeros(w,h,'uint8');
+ key2=zeros(w,h,'uint8');
+ key3=zeros(w,h,'uint8');
+  
+r = nmatrix(:,:,1);
+g = nmatrix(:,:,2);
+b = nmatrix(:,:,3);
+ [m,n]=size(r);
+ %figure(2),imshow(r);
+ %figure(3),imshow(g);
+ %figure(4),imshow(b);
+ %figure(5),imhist(r);
+ %figure(6),imhist(g);
+ %figure(7),imhist(b);
+ for i=1:m
+        sx(i)=X(i);
+        sy(i)=Y(i);
+ end
+    
+    [sortx1,indexx1]=sort(sx);
+         [sorty1,indexy1]=sort(sy);
+         
+         j=1;
+         for i=m:m+h-1
+        sx(j)=X(i);
+        sy(j)=Y(i);
+        j=j+1;
+ end
+    
+    [sortx1,indexx2]=sort(sx);
+         [sorty1,indexy2]=sort(sy);
+         
+     kj=m+w; 
+     j=1;
+         
+            for i=kj:kj+h-1
+        sx(j)=X(i);
+        sy(j)=Y(i);
+        j=j+1;
+ end
+    
+    [sortx1,indexx3]=sort(sx);
+         [sorty1,indexy3]=sort(sy);
+         %  this code for encrypt the r value
+ii=0;
+for row=1:w
+       ii=ii+1;
+       jj=1;
+               for col=1:h
+           temp=r(row,col);
+           r(row,col)=r(indexx1(ii),indexy1(jj));
+           r(indexx1(ii),indexy1(jj))=temp;
+           jj=jj+1;
+                end
+end
+%figure(5),imshow(r);
+ii=0;
+ for row=1:w
+       ii=ii+1;
+       jj=1;
+      for col=1:h
+         temp=g(row,col);
+           g(row,col)=g(indexx2(ii),indexy2(jj));
+           g(indexx2(ii),indexy2(jj))=temp;
+           jj=jj+1;
+       end
+ end
+ %figure(6),imshow(g);
+ ii=0;
+ for row=1:w
+       ii=ii+1;
+       jj=1;
+               for col=1:h
+           temp=b(row,col);
+           b(row,col)=b(indexx3(ii),indexy3(jj));
+           b(indexx3(ii),indexy3(jj))=temp;
+           jj=jj+1;
+                end
+ end
+ %figure(7),imshow(b);
+ %figure,imhist(r);
+%figure,imhist(g);
+%figure,imhist(b);
+ cimage1=cat(3,r,g,b);
+%figure(8),imshow(cimage1);
+
+
+ p=1;q=1;
+     for i=1:w
+         for j=1:h
+             if(mod(j,2)==0)
+             key1(i,j)=fix(mod((X(p)*1000),w));p=p+1;
+             else
+                 key1(i,j)=fix(mod((Y(p)*1000),h)); q=q+1;
+             end
+         end
+     end
+     
+     key2= circshift(key1, [17,14]);
+     key3=circshift(key2, [10,12]);
+     
+     er=bitxor(r,key1,'uint8');
+     eg=bitxor(g,key2,'uint8');
+     eb=bitxor(b,key3,'uint8');
+     %figure(9),imshow(er);
+     %figure(12),imhist(er);
+     %figure(10),imshow(eg);
+     %figure(13),imhist(eg);
+     %figure(11),imshow(eb);
+      cimage2=cat(3,er,eg,eb);
+    %figure(12),imshow(cimage2);
+
+save('yashproject','cimage2');
+
+
+for i = 1:w
+    sx(i) = X(i);
+    sy(i) = Y(i);
+end
+
+[sortx1, indexx1] = sort(sx);
+[sorty1, indexy1] = sort(sy);
+
+j = 1;
+for i = w:w+h-1
+    sx(j) = X(i);
+    sy(j) = Y(i);
+    j = j+1;
+end
+
+[sortx1, indexx2] = sort(sx);
+[sorty1, indexy2] = sort(sy);
+
+kj = w+h; 
+j = 1;
+
+for i = kj:kj+h-1
+    sx(j) = X(i);
+    sy(j) = Y(i);
+    j = j+1;
+end
+
+[sortx1, indexx3] = sort(sx);
+[sorty1, indexy3] = sort(sy);
+
+ii = 0;
+for row = 1:w
+    ii = ii+1;
+    jj = 1;
+    for col = 1:h
+        temp = r(row, col);
+        r(row, col) = r(indexx1(ii), indexy1(jj));
+        r(indexx1(ii), indexy1(jj)) = temp;
+        jj = jj+1;
+    end
+end
+
+
+ii = 0;
+for row = 1:w
+    ii = ii+1;
+    jj = 1;
+    for col = 1:h
+        temp = g(row, col);
+        g(row, col) = g(indexx2(ii), indexy2(jj));
+        g(indexx2(ii), indexy2(jj)) = temp;
+        jj = jj+1;
+    end
+end
+
+subplot(3, 3, 5);
+imshow(g);
+title('Encrypted-G');
+
+ii = 0;
+for row = 1:w
+    ii = ii+1;
+    jj = 1;
+    for col = 1:h
+        temp = b(row, col);
+        b(row, col) = b(indexx3(ii), indexy3(jj));
+        b(indexx3(ii), indexy3(jj)) = temp;
+        jj = jj+1;
+    end
+end
+
+
+key1 = zeros(w, h, 'uint8');
+key2 = circshift(key1, [17, 14]);
+key3 = circshift(key2, [10, 12]);
+
+er = bitxor(r, key1, 'uint8');
+eg = bitxor(g, key2, 'uint8');
+eb = bitxor(b, key3, 'uint8');
+
+% Original image
+subplot(3, 3, 1);
+imshow(im);
+title('Original Image');
+
+% Resized image
+subplot(3, 3, 2);
+imshow(im1);
+title('Resized Image');
+
+% Extracted RGB channels
+subplot(3, 3, 3);
+imshow(r);
+title('Red Channel');
+
+subplot(3, 3, 4);
+imshow(g);
+title('Green Channel');
+
+subplot(3, 3, 5);
+imshow(b);
+title('Blue Channel');
+
+% Encrypted RGB channels
+subplot(3, 3, 6);
+imshow(er);
+title('E-R-Channel');
+
+subplot(3, 3, 7);
+imshow(eg);
+title('E-G-Channel');
+
+subplot(3, 3, 8);
+imshow(eb);
+title('E-B-Channel');
+
+% Combined encrypted image
+subplot(3, 3, 9);
+imshow(cimage2);
+title('Combined Encrypted Image');
+
+% Adjust the layout to prevent overlapping
+sgtitle('Encryption Outputs');
+
+save('yashproject', 'cimage2');
+
+%save('yashproject', 'cimage2');
