@@ -1,5 +1,5 @@
 # Encryption_decryption_of_colour-images
-# Image Encryption Using Chaotic Maps
+# Colour Image Encryption Decryption Algorithm Based on the novel 2D Logistic Cos-Sine Maps
 
 This MATLAB project demonstrates image encryption using chaotic maps, specifically two-dimensional Logistic cosine-sine maps. The algorithm encrypts and decrypts RGB channels of an image using three encryption keys generated from chaotic sequences.
 
