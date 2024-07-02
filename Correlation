@@ -1,0 +1,137 @@
+close all;
+clear all;
+% correlation coefficient
+
+load('yashproject','cimage2');
+%  im=imread('lenna1.jpg');
+url = 'https://images.macrumors.com/t/7pc3PgVMOcuW0ncg4PuJMIyWg9g=/400x0/article-new/2014/01/iris.jpg?lossy';
+
+% Specify the local file path where you want to save the image
+localFilePath = 'path_to_save_image.jpg';
+
+% Download the image from the URL to your local machine
+websave(localFilePath, url);
+
+% Read the downloaded image using imread
+im = imread(localFilePath);
+imshow(im)
+p=256
+q=256
+ im1=imresize(im,[p q]);
+  rmatrix=im1;
+  
+r = rmatrix(:,:,1);
+g = rmatrix(:,:,2);
+b = rmatrix(:,:,3);
+
+  cr = cimage2(:,:,1);
+cg = cimage2(:,:,2);
+cb = cimage2(:,:,3);
+
+A=r;
+J=cr;
+% display(entropy(J));
+% display(corr2(A,J)); 
+% figure(1),imshow(I);
+% figure(2),imshow(J);
+
+% correlation coefficient of horizontal pixels
+
+x = A(:,1:100-1,1);  %# All rows and columns 1 through 255 from red plane
+y = A(:,2:100,1);    %# All rows and columns 2 through 256 from red plane
+   hor=corr2(x,y);
+   figure,plot(x,y,'b.','markersize',1);
+   %display('horizontal pixel analysis for plain image');
+   display(hor);
+% 
+x = J(:,1:100-1,1);  %# All rows and columns 1 through 255 from red plane
+y = J(:,2:100,1);    %# All rows and columns 2 through 256 from red plane
+ chor=corr2(x,y);
+  figure,plot(x,y,'b.','markersize',1);
+ %display('horizontal pixel analysis for ciphered image');
+ display(chor);
+%   figure,plot(x,y,'b*');
+% correlation coefficient of vertical pixels of plain image
+x = A(1:100-1,:,1);  %# Rows 1 through 255 and all columns from red plane
+y = A(2:100,:,1);    %# Rows 2 through 256 and all columns from red plane
+pvcor=corr2(x,y);
+% display('vertical pixel analysis for plain image');
+    display(pvcor);
+   % figure,plot(x,y,'r.','markersize',1);
+%  figure,plot(x,y,'color',[0 0.5 0],'linestyle','.');
+
+
+x = J(1:100-1,:,1);  %# Rows 1 through 255 and all columns from red plane
+y = J(2:100,:,1);    %# Rows 2 through 256 and all columns from red plane
+cvcor=corr2(x,y);
+vx=x;vy=y;
+ %display('vertical pixel analysis for ciphered image');
+%  sprintf('%f',cvcor);
+ display(cvcor);
+   % figure,plot(x,y,'k.','markersize',1);
+
+%correlation coefficient of diagonal pixels of plain image
+
+x = A(1:100-1,1:100-1,1);  %# All but the last row and column
+y = A(2:100,2:100,1);      %# All but the first row and column
+pdcor=corr2(x,y);
+% display('diagonal pixel analysis for plain image');
+    display(pdcor);
+%   figure,plot(x,y,'k.','markersize',1);
+
+x = J(1:100-1,1:100-1,1);  %# All but the last row and column
+y = J(2:100,2:100,1);      %# All but the first row and column
+cdcor=corr2(x,y);
+%display('diagonal pixel analysis for ciphered image');
+display(cdcor);
+dx=x;dy=y;
+  figure,plot(x,y,'k.','markersize',1);
+
+% plot(x,y,'b.','markersize',2);
+% title('Diagonal direction');
+% xlabel('pixel value on (x,y)');
+% ylabel('pixel value on (x+1,y+1)');
+ z=zeros(99,p,'uint8');
+ vz=ones(p-1,p,'uint8');
+ dz=zeros(p-1,p-1,'uint8');
+ dz(1:p-1,1:p-1)=2; 
+
+% % correlation coefficient of horizontal pixels
+% % z=zeros(255,255,'uint8');
+% scatter3(x,z,y,'r.');
+%   hold on
+%  scatter3(vx,vz,vy,'b.');
+% 
+%  scatter3(dx,dz,dy,'g.');
+%  hold off
+subplot(2, 3, 1);
+plot(x, y, 'b.', 'markersize', 1);
+title('Horizontal-plain Image');
+xlabel('Pixel Value (x)');
+ylabel('Pixel Value (x+1)');
+
+subplot(2, 3, 2);
+plot(x, y, 'b.', 'markersize', 1);
+title('Horizontal-Ciphered Image');
+xlabel('Pixel Value (x)');
+ylabel('Pixel Value (x+1)');
+
+subplot(2, 3, 3);
+plot(x, y, 'r.', 'markersize', 1);
+title('Vertical-Plain Image');
+xlabel('Pixel Value (y)');
+ylabel('Pixel Value (y+1)');
+
+subplot(2, 3, 4);
+plot(x, y, 'k.', 'markersize', 1);
+title('Diagonal-Plain Image');
+xlabel('Pixel Value (x)');
+ylabel('Pixel Value (x+1)');
+
+subplot(2, 3, 5);
+plot(x, y, 'k.', 'markersize', 1);
+title('Diagonal-Ciphered Image');
+xlabel('Pixel Value (x)');
+ylabel('Pixel Value (x+1)');
+
+sgtitle('Pixel Analysis');
